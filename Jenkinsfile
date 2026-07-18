@@ -5,7 +5,7 @@ pipeline {
         kubernetes {
             yaml mavenPodYaml(
                  useCache: false,
-                 image: crpi-whdz2l2sopzelm2i-vpc.cn-beijing.personal.cr.aliyuncs.com/kangvai/maven:3.9-eclipse-temurin-17
+                 image: 'crpi-whdz2l2sopzelm2i-vpc.cn-beijing.personal.cr.aliyuncs.com/kangvai/maven:3.9-eclipse-temurin-17'
             )
         }
     }
