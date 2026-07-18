@@ -3,7 +3,7 @@
 pipeline {
     agent {
         kubernetes {
-            yaml mavenPodYaml(
+            yaml mavenPodKanikoYaml(
                  useCache: false,
             )
         }
