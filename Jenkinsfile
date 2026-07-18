@@ -10,7 +10,6 @@ pipeline {
     }
     environment {
         IMAGE_NAME = "crpi-whdz2l2sopzelm2i-vpc.cn-beijing.personal.cr.aliyuncs.com/kangvai/simple-java-maven-app"
-        IMAGE_TAG  = "${env.BUILD_NUMBER}"
     }
     options {
         timeout(time: 15, unit: 'MINUTES')
@@ -54,7 +53,13 @@ pipeline {
             }
         }
         stage('构建镜像并推送') {
+            environment {
+                IMAGE_TAG = "${env.GIT_COMMIT.take(6)}"
+            }
             steps {
+                script {
+                    currentBuild.description = "image tag: ${env.IMAGE_TAG}"
+                }
                 container('kaniko') {
                     sh """
                         /kaniko/executor \
@@ -68,7 +73,7 @@ pipeline {
         }
     }
     post {
-        success { echo '✅ 构建成功,镜像已推送' }
+        success { echo "✅ 构建成功,镜像已推送: ${IMAGE_NAME}:${env.IMAGE_TAG}" }
         failure { echo '❌ 构建失败' }
     }
 }
