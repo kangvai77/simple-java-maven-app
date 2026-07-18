@@ -5,9 +5,14 @@ pipeline {
         kubernetes {
             yaml mavenPodYaml(
                  useCache: false,
+                 withKaniko: true,
                  image:'crpi-whdz2l2sopzelm2i-vpc.cn-beijing.personal.cr.aliyuncs.com/kangvai/maven:3.9-eclipse-temurin-21'
             )
         }
+    }
+    environment {
+        IMAGE_NAME = "crpi-whdz2l2sopzelm2i-vpc.cn-beijing.personal.cr.aliyuncs.com/kangvai/simple-java-maven-app"
+        IMAGE_TAG  = "${env.BUILD_NUMBER}"
     }
     options {
         timeout(time: 15, unit: 'MINUTES')
@@ -50,9 +55,22 @@ pipeline {
                 archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
             }
         }
+        stage('构建镜像并推送') {
+            steps {
+                container('kaniko') {
+                    sh """
+                        /kaniko/executor \
+                          --context=`pwd` \
+                          --dockerfile=Dockerfile \
+                          --destination=${IMAGE_NAME}:${IMAGE_TAG} \
+                          --destination=${IMAGE_NAME}:latest
+                    """
+                }
+            }
+        }
     }
     post {
-        success { echo '✅ 构建成功' }
+        success { echo '✅ 构建成功,镜像已推送' }
         failure { echo '❌ 构建失败' }
     }
 }
