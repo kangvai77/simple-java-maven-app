@@ -53,11 +53,9 @@ pipeline {
             }
         }
         stage('构建镜像并推送') {
-            environment {
-                IMAGE_TAG = "${env.GIT_COMMIT.take(6)}"
-            }
             steps {
                 script {
+                    env.IMAGE_TAG = env.GIT_COMMIT.take(7)
                     currentBuild.description = "image tag: ${env.IMAGE_TAG}"
                 }
                 container('kaniko') {
@@ -65,7 +63,7 @@ pipeline {
                         /kaniko/executor \
                           --context=`pwd` \
                           --dockerfile=Dockerfile \
-                          --destination=${IMAGE_NAME}:${IMAGE_TAG} \
+                          --destination=${IMAGE_NAME}:${env.IMAGE_TAG} \
                           --destination=${IMAGE_NAME}:latest
                     """
                 }
