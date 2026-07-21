@@ -3,8 +3,12 @@
 pipeline {
     agent {
         kubernetes {
-            yaml mavenPodKanikoYaml(
-                 useCache: false,
+            yaml mavenKanikoGitYaml(
+                namespace: 'pipeline',
+                imagePullPolicy: 'IfNotPresent',
+                useCache: true,
+                cacheClaimName: 'maven-cache-pvc',
+                acrSecretName: 'acr-secret'
             )
         }
     }
@@ -69,6 +73,20 @@ pipeline {
                 }
             }
         }
+        stage('更新 GitOps 配置仓库') {
+            steps {
+                container('git') {
+                    updateGitOpsRepo(
+                        repoUrl: 'https://gitlab.com/kangvai/simple-java-maven-app-manifests.git',
+                        branch: 'dev',
+                        gitUserEmail: 'kangvai.cn@gmail.com',
+                        gitUserName: 'kangvai',
+                        image: "${IMAGE_NAME}:${env.IMAGE_TAG}",
+                        credentialsId: 'github-token'
+                    )
+            }
+    }
+}
     }
     post {
         success { echo "✅ 构建成功,镜像已推送: ${IMAGE_NAME}:${env.IMAGE_TAG}" }
