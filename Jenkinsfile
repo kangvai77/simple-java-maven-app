@@ -77,8 +77,8 @@ pipeline {
             steps {
                 container('git') {
                     updateGitOpsRepo(
-                        repoUrl: 'https://gitlab.com/kangvai/simple-java-maven-app-manifests.git',
-                        branch: 'dev',
+                        repoUrl: 'https://github.com/kangvai77/simple-java-maven-app-manifests.git',
+                        branch: 'main',
                         gitUserEmail: 'kangvai.cn@gmail.com',
                         gitUserName: 'kangvai',
                         image: "${IMAGE_NAME}:${env.IMAGE_TAG}",
